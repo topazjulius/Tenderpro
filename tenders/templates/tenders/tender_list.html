@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+<h2 class="mb-4">Available Tenders</h2>
+
+<!-- SEARCH BAR -->
+
+<form method="GET" class="mb-4">
+
+<div class="input-group">
+
+<input
+type="text"
+name="q"
+class="form-control"
+placeholder="Search tenders..."
+value="{{ query }}"
+
+>
+
+<button class="btn btn-primary">
+Search
+</button>
+
+</div>
+
+</form>
+
+<!-- FILTER BUTTONS -->
+
+<div class="mb-4">
+
+<a href="?status=open" class="btn btn-success">
+Show Open Tenders
+</a>
+
+<a href="{% url 'tender_list' %}" class="btn btn-secondary">
+Show All Tenders
+</a>
+
+</div>
+
+<div class="row">
+
+{% for tender in tenders %}
+
+<div class="col-md-6">
+
+<div class="card mb-4 shadow-sm">
+
+<div class="card-body">
+
+<h4>{{ tender.title }}</h4>
+
+<p>{{ tender.description|truncatewords:25 }}</p>
+
+<p>
+<strong>Deadline:</strong> {{ tender.deadline }}
+</p>
+
+<!-- TENDER STATUS BADGES -->
+
+<p>
+
+{% if tender.awarded_bid %} <span class="badge bg-warning text-dark">🏆 AWARDED</span>
+
+{% elif tender.is_open %} <span class="badge bg-success">OPEN</span>
+
+{% else %} <span class="badge bg-secondary">CLOSED</span>
+
+{% endif %}
+
+</p>
+
+<!-- ACTION BUTTONS -->
+
+<a href="{% url 'tender_detail' tender.id %}" class="btn btn-primary">
+View Tender
+</a>
+
+{% if request.user.is_staff %} <a href="{% url 'evaluate_tender' tender.id %}" class="btn btn-warning">
+Evaluate Bids </a>
+{% endif %}
+
+</div>
+
+</div>
+
+</div>
+
+{% empty %}
+
+<div class="col-12">
+
+<div class="alert alert-warning">
+No tenders available.
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+{% endblock %}

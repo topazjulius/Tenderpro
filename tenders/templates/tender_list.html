@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 class="mb-4">Available Tenders</h2>
+
+<div class="row">
+
+{% for tender in tenders %}
+
+<div class="col-md-6">
+
+<div class="card mb-4 shadow-sm">
+
+<div class="card-body">
+
+<h4>{{ tender.title }}</h4>
+
+<p>{{ tender.description }}</p>
+
+<p>
+<strong>Deadline:</strong> {{ tender.deadline }}
+</p>
+
+<p>
+<strong>Status:</strong>
+
+{% if tender.is_open %}
+<span class="badge bg-success">OPEN</span>
+{% else %}
+<span class="badge bg-danger">CLOSED</span>
+{% endif %}
+
+</p>
+
+<a href="{% url 'tender_detail' tender.id %}" class="btn btn-primary">
+View Tender
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% endblock %}

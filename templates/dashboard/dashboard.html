@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mb-5">
+
+<h3 class="mb-4">System Statistics</h3>
+
+<div class="row">
+
+<div class="col-md-3">
+<div class="card text-center shadow-sm">
+<div class="card-body">
+<h4>{{ total_tenders }}</h4>
+<p>Total Tenders</p>
+</div>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card text-center shadow-sm">
+<div class="card-body">
+<h4>{{ total_bids }}</h4>
+<p>Total Bids</p>
+</div>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card text-center shadow-sm">
+<div class="card-body">
+<h4>{{ open_tenders }}</h4>
+<p>Open Tenders</p>
+</div>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card text-center shadow-sm">
+<div class="card-body">
+<h4>{{ awarded_tenders }}</h4>
+<p>Awarded Tenders</p>
+</div>
+</div>
+</div>
+
+</div>
+
+</div>
+
+
+<div class="container mt-5">
+
+<h2 class="mb-4">Vendor Dashboard</h2>
+
+<table class="table table-bordered">
+
+<thead class="table-dark">
+<tr>
+<th>Tender</th>
+<th>Bid Amount</th>
+<th>Submitted</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for bid in bid_data %}
+
+<tr>
+
+<td>{{ bid.tender.title }}</td>
+
+<td>Ksh {{ bid.amount }}</td>
+
+<td>{{ bid.submitted_at }}</td>
+
+<td>
+
+{% if bid.status == "WON" %}
+<span class="badge bg-success">WON</span>
+
+{% elif bid.status == "LOST" %}
+<span class="badge bg-danger">LOST</span>
+
+{% else %}
+<span class="badge bg-warning text-dark">PENDING</span>
+
+{% endif %}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Vendor Registration</h2>
+
+<form method="POST">
+{% csrf_token %}
+
+<input class="form-control mb-3" name="username" placeholder="Username">
+
+<input class="form-control mb-3" name="password" type="password" placeholder="Password">
+
+<button class="btn btn-primary">
+Register
+</button>
+
+</form>
+
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+<h2 class="mb-4">Admin Analytics Dashboard</h2>
+
+<div class="row g-4">
+
+<div class="col-md-4">
+<div class="card text-white bg-primary shadow">
+<div class="card-body">
+<h5>Total Tenders</h5>
+<h2>{{ total_tenders }}</h2>
+</div>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="card text-white bg-success shadow">
+<div class="card-body">
+<h5>Open Tenders</h5>
+<h2>{{ open_tenders }}</h2>
+</div>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="card text-white bg-secondary shadow">
+<div class="card-body">
+<h5>Closed Tenders</h5>
+<h2>{{ closed_tenders }}</h2>
+</div>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="card text-dark bg-warning shadow">
+<div class="card-body">
+<h5>Total Bids</h5>
+<h2>{{ total_bids }}</h2>
+</div>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="card text-white bg-info shadow">
+<div class="card-body">
+<h5>Registered Vendors</h5>
+<h2>{{ total_vendors }}</h2>
+</div>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="card text-white bg-dark shadow">
+<div class="card-body">
+<h5>Awarded Tenders</h5>
+<h2>{{ awarded_tenders }}</h2>
+</div>
+</div>
+</div>
+
+</div>
+
+
+<!-- Chart Section -->
+<div class="card shadow mt-5">
+<div class="card-body">
+
+<h4 class="mb-4">Tender Statistics</h4>
+
+<canvas id="tenderChart" height="100"></canvas>
+
+</div>
+</div>
+
+</div>
+
+
+<!-- Chart Script -->
+{{ open_tenders|json_script:"openTendersData" }}
+{{ closed_tenders|json_script:"closedTendersData" }}
+{{ awarded_tenders|json_script:"awardedTendersData" }}
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+const openTenders = JSON.parse(document.getElementById('openTendersData').textContent);
+const closedTenders = JSON.parse(document.getElementById('closedTendersData').textContent);
+const awardedTenders = JSON.parse(document.getElementById('awardedTendersData').textContent);
+
+const chartCanvas = document.getElementById("tenderChart");
+
+if (chartCanvas) {
+
+new Chart(chartCanvas, {
+type: "bar",
+data: {
+labels: ["Open Tenders", "Closed Tenders", "Awarded Tenders"],
+datasets: [{
+label: "Tender Statistics",
+data: [openTenders, closedTenders, awardedTenders],
+backgroundColor: [
+"#28a745",
+"#6c757d",
+"#212529"
+]
+}]
+},
+options: {
+responsive: true,
+plugins: {
+legend: {
+display: true
+}
+}
+}
+});
+
+}
+
+});
+
+</script>
+
+{% endblock %}

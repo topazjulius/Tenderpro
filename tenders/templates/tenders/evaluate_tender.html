@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+<h2 class="mb-3">Evaluate Tender</h2>
+
+<h4 class="mb-4 text-primary">{{ tender.title }}</h4>
+
+<div class="card shadow">
+<div class="card-body">
+
+<table class="table table-bordered table-striped align-middle">
+
+<thead class="table-dark">
+<tr>
+<th>Rank</th>
+<th>Vendor</th>
+<th>Bid Amount (KES)</th>
+<th>Proposal</th>
+<th>Submitted</th>
+<th>Status / Action</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for bid in bids %}
+
+<tr
+{% if tender.awarded_bid == bid %}
+class="table-success"
+{% elif forloop.first %}
+class="table-warning"
+{% endif %}
+>
+
+<!-- 🥇 Rank -->
+<td>
+{% if forloop.first %}
+🥇 1
+{% else %}
+{{ forloop.counter }}
+{% endif %}
+</td>
+
+<!-- Vendor -->
+<td>{{ bid.vendor.username }}</td>
+
+<!-- Amount -->
+<td><strong>KES {{ bid.amount }}</strong></td>
+
+<!-- Proposal -->
+<td>
+{% if bid.proposal_document %}
+<a href="{{ bid.proposal_document.url }}" class="btn btn-sm btn-info">
+Download
+</a>
+{% else %}
+<span class="text-muted">No document</span>
+{% endif %}
+</td>
+
+<!-- Date -->
+<td>{{ bid.created_at }}</td>
+
+<!-- Status / Action -->
+<td>
+
+{% if tender.awarded_bid == bid %}
+
+<span class="badge bg-success">
+🏆 Winner
+</span>
+
+{% elif tender.awarded_bid %}
+
+<span class="badge bg-secondary">
+Lost
+</span>
+
+{% elif forloop.first %}
+
+<a href="{% url 'award_bid' tender.id bid.id %}" class="btn btn-success btn-sm">
+Award Winner
+</a>
+
+{% else %}
+
+<span class="badge bg-warning text-dark">
+Competing
+</span>
+
+{% endif %}
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="6" class="text-center">
+No bids submitted yet
+</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+</div>
+
+</div>
+
+{% endblock %}

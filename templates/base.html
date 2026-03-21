@@ -34,13 +34,15 @@ Tender Management System
 <a class="nav-link" href="/tenders/">Tenders</a>
 </li>
 
+<!-- ✅ ONLY LOGGED IN USERS -->
+{% if request.user.is_authenticated %}
+
 <li class="nav-item">
 <a class="nav-link" href="/dashboard/">Dashboard</a>
 </li>
 
-<!-- ✅ ADMIN LINKS -->
+<!-- ✅ ADMIN ONLY -->
 {% if request.user.is_staff %}
-
 <li class="nav-item">
 <a class="nav-link" href="/dashboard/admin-dashboard/">
 Admin Analytics
@@ -53,17 +55,29 @@ Vendor Performance
 </a>
 </li>
 
-{% endif %}
-
 <li class="nav-item">
 <a class="nav-link" href="/admin/">Admin</a>
 </li>
+{% endif %}
 
 <li class="nav-item">
 <a class="nav-link text-warning" href="/accounts/logout/">
 Logout
 </a>
 </li>
+
+<!-- ❌ NOT LOGGED IN USERS -->
+{% else %}
+
+<li class="nav-item">
+<a class="nav-link" href="{% url 'login' %}">Login</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="{% url 'register' %}">Register</a>
+</li>
+
+{% endif %}
 
 </ul>
 
@@ -73,8 +87,19 @@ Logout
 
 </nav>
 
+<!-- ✅ GLOBAL MESSAGES -->
+<div class="container mt-3">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-info">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
 <!-- PAGE CONTENT -->
-<div class="container mt-5">
+<div class="container mt-4">
 
 {% block content %}
 {% endblock %}

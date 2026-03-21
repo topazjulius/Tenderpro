@@ -1,36 +1,63 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 
 
+# ==============================
+# REGISTER VIEW
+# ==============================
 def register_vendor(request):
 
     if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
 
+        # 🔒 Validation
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match")
+            return redirect('register')
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists")
+            return redirect('register')
+
+        # ✅ Create user
         User.objects.create_user(username=username, password=password)
+        messages.success(request, "Account created successfully. Please login.")
 
         return redirect('login')
 
     return render(request, 'accounts/register.html')
 
 
+# ==============================
+# LOGIN VIEW
+# ==============================
 def login_vendor(request):
 
     if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
             login(request, user)
-            return redirect('/tenders/')
+            return redirect('/tenders/')  # or dashboard
+
+        else:
+            messages.error(request, "Invalid username or password")
+            return redirect('login')
 
     return render(request, 'accounts/login.html')
 
 
+# ==============================
+# LOGOUT VIEW
+# ==============================
 def logout_vendor(request):
     logout(request)
+    messages.success(request, "Logged out successfully")
     return redirect('/')

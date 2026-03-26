@@ -2,60 +2,67 @@
 
 {% block content %}
 
-<div class="container mb-5">
+<div class="container-fluid mt-4">
 
-<h3 class="mb-4">System Statistics</h3>
+<!-- HEADER -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold">Vendor Dashboard</h3>
+    <span class="text-muted">Welcome, {{ request.user.username }}</span>
+</div>
 
-<div class="row">
-
-<div class="col-md-3">
-<div class="card text-center shadow-sm">
-<div class="card-body">
-<h4>{{ total_tenders }}</h4>
-<p>Total Tenders</p>
-</div>
-</div>
-</div>
+<!-- KPI CARDS -->
+<div class="row g-4 mb-4">
 
 <div class="col-md-3">
-<div class="card text-center shadow-sm">
-<div class="card-body">
-<h4>{{ total_bids }}</h4>
-<p>Total Bids</p>
-</div>
+<div class="card shadow border-0 p-3 text-center">
+<i class="fa-solid fa-file-contract fa-2x text-primary mb-2"></i>
+<h4>{{ total_tenders|default:0 }}</h4>
+<p class="text-muted mb-0">Total Tenders</p>
 </div>
 </div>
 
 <div class="col-md-3">
-<div class="card text-center shadow-sm">
-<div class="card-body">
-<h4>{{ open_tenders }}</h4>
-<p>Open Tenders</p>
-</div>
+<div class="card shadow border-0 p-3 text-center">
+<i class="fa-solid fa-gavel fa-2x text-success mb-2"></i>
+<h4>{{ total_bids|default:0 }}</h4>
+<p class="text-muted mb-0">My Bids</p>
 </div>
 </div>
 
 <div class="col-md-3">
-<div class="card text-center shadow-sm">
+<div class="card shadow border-0 p-3 text-center">
+<i class="fa-solid fa-hourglass-half fa-2x text-warning mb-2"></i>
+<h4>{{ open_tenders|default:0 }}</h4>
+<p class="text-muted mb-0">Open Tenders</p>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card shadow border-0 p-3 text-center">
+<i class="fa-solid fa-trophy fa-2x text-danger mb-2"></i>
+<h4>{{ awarded_tenders|default:0 }}</h4>
+<p class="text-muted mb-0">Awards</p>
+</div>
+</div>
+
+</div>
+
+<!-- BID TABLE -->
+<div class="card shadow border-0">
+
+<div class="card-header bg-white border-0">
+<h5 class="mb-0">My Bids</h5>
+</div>
+
 <div class="card-body">
-<h4>{{ awarded_tenders }}</h4>
-<p>Awarded Tenders</p>
-</div>
-</div>
-</div>
 
-</div>
+{% if bid_data %}
 
-</div>
+<div class="table-responsive">
 
+<table class="table table-hover align-middle">
 
-<div class="container mt-5">
-
-<h2 class="mb-4">Vendor Dashboard</h2>
-
-<table class="table table-bordered">
-
-<thead class="table-dark">
+<thead class="table-light">
 <tr>
 <th>Tender</th>
 <th>Bid Amount</th>
@@ -70,22 +77,28 @@
 
 <tr>
 
-<td>{{ bid.tender.title }}</td>
+<td class="fw-semibold">
+{{ bid.tender.title }}
+</td>
 
-<td>Ksh {{ bid.amount }}</td>
+<td>
+Ksh {{ bid.amount }}
+</td>
 
-<td>{{ bid.submitted_at }}</td>
+<td>
+<small class="text-muted">{{ bid.submitted_at }}</small>
+</td>
 
 <td>
 
 {% if bid.status == "WON" %}
-<span class="badge bg-success">WON</span>
+<span class="badge bg-success px-3 py-2">✔ WON</span>
 
 {% elif bid.status == "LOST" %}
-<span class="badge bg-danger">LOST</span>
+<span class="badge bg-danger px-3 py-2">✖ LOST</span>
 
 {% else %}
-<span class="badge bg-warning text-dark">PENDING</span>
+<span class="badge bg-warning text-dark px-3 py-2">⏳ PENDING</span>
 
 {% endif %}
 
@@ -98,6 +111,26 @@
 </tbody>
 
 </table>
+
+</div>
+
+{% else %}
+
+<!-- EMPTY STATE -->
+<div class="text-center py-5">
+<i class="fa-solid fa-folder-open fa-3x text-muted mb-3"></i>
+<h5>No bids yet</h5>
+<p class="text-muted">You haven’t applied to any tenders yet.</p>
+
+<a href="/tenders/" class="btn btn-primary mt-2">
+Browse Tenders
+</a>
+</div>
+
+{% endif %}
+
+</div>
+</div>
 
 </div>
 

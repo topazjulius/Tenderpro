@@ -1,55 +1,158 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 
-<div class="text-center mb-5">
+<!-- =============================== -->
+<!-- HERO SECTION -->
+<!-- =============================== -->
+<section class="hero-section d-flex align-items-center">
 
-<h1 class="display-5 fw-bold">
-Tender Management Portal
-</h1>
+    <div class="container">
 
-<p class="lead">
-A digital platform for publishing tenders and allowing vendors to submit bids online.
-</p>
+        <div class="row align-items-center">
 
-<a href="/tenders/" class="btn btn-primary btn-lg">
-View Available Tenders
-</a>
+            <!-- LEFT CONTENT -->
+            <div class="col-md-6 text-white">
 
-</div>
+                <h1 class="display-4 fw-bold">
+                    Streamlining Procurement for Higher Learning Institutions in Kenya
+                </h1>
+
+                <p class="lead mt-3">
+                    Connect with Higher learning Institutions both public $ private universities, and College tenders.
+                    Submit bids, track performance, and win contracts — all in one place.
+                </p>
+
+                <div class="mt-4">
+                    <a href="{% url 'tender_list' %}" class="btn btn-primary btn-lg px-4 me-3">
+                        🚀 Explore Tenders
+                    </a>
+
+                    <a href="#" class="btn btn-outline-light btn-lg px-4">
+                        ▶ How It Works
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- RIGHT STATS -->
+            <div class="col-md-6">
+
+                <div class="row text-center">
+
+                    <div class="col-4">
+                        <div class="p-4 stats-card">
+                            <h2 class="fw-bold text-warning">{{ total_tenders }}</h2>
+                            <p>Active Tenders</p>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="p-4 stats-card">
+                            <h2 class="fw-bold text-warning">{{ total_vendors }}</h2>
+                            <p>Vendors</p>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="p-4 stats-card">
+                            <h2 class="fw-bold text-warning">{{ total_awards }}</h2>
+                            <p>Awards</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =============================== -->
+<!-- ABOUT SECTION -->
+<!-- =============================== -->
+<section class="container my-5">
+
+    <div class="row align-items-center">
+
+        <!-- LEFT (IMAGE) -->
+        <div class="col-md-6">
+            <img src="{% static 'images/about.jpg' %}" 
+                 class="img-fluid rounded shadow" 
+                 alt="About TenderPro">
+        </div>
+
+        <!-- RIGHT (TEXT) -->
+        <div class="col-md-6">
+
+            <h2 class="fw-bold mb-3">
+                About TenderPro
+            </h2>
+
+            <p class="text-muted">
+                TenderPro is a modern digital procurement platform designed to simplify 
+                how organizations and vendors interact. We connect suppliers with 
+                government institutions, universities, and private sector opportunities.
+            </p>
+
+            <p class="text-muted">
+                Our system ensures transparency, efficiency, and fairness in the bidding 
+                process while giving vendors powerful tools to track performance and win more contracts.
+            </p>
+
+            <a href="/tenders/" class="btn btn-primary mt-3 px-4">
+                Explore Opportunities
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
 
 
-<div class="row text-center">
+<!-- =============================== -->
+<!-- FEATURES SECTION -->
+<!-- =============================== -->
+<section class="container my-5">
 
-<div class="col-md-4">
-<div class="card shadow-sm">
-<div class="card-body">
-<h4>View Tenders</h4>
-<p>Browse all active tenders published by the institution.</p>
-</div>
-</div>
-</div>
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Why Choose TenderPro?</h2>
+        <p class="text-muted">Powerful tools to simplify procurement</p>
+    </div>
 
+    <div class="row text-center g-4">
 
-<div class="col-md-4">
-<div class="card shadow-sm">
-<div class="card-body">
-<h4>Submit Bids</h4>
-<p>Registered vendors can submit bids online securely.</p>
-</div>
-</div>
-</div>
+        <div class="col-md-4">
+            <div class="card shadow-sm p-4 h-100 border-0">
+                <i class="fas fa-file-contract fa-2x mb-3 text-primary"></i>
+                <h5 class="fw-bold">Easy Bidding</h5>
+                <p class="text-muted">Submit and manage bids effortlessly</p>
+            </div>
+        </div>
 
+        <div class="col-md-4">
+            <div class="card shadow-sm p-4 h-100 border-0">
+                <i class="fas fa-chart-line fa-2x mb-3 text-success"></i>
+                <h5 class="fw-bold">Analytics</h5>
+                <p class="text-muted">Track performance and success rates</p>
+            </div>
+        </div>
 
-<div class="col-md-4">
-<div class="card shadow-sm">
-<div class="card-body">
-<h4>Transparent Procurement</h4>
-<p>The system ensures fairness and transparency.</p>
-</div>
-</div>
-</div>
+        <div class="col-md-4">
+            <div class="card shadow-sm p-4 h-100 border-0">
+                <i class="fas fa-shield-alt fa-2x mb-3 text-danger"></i>
+                <h5 class="fw-bold">Secure System</h5>
+                <p class="text-muted">Safe and transparent procurement process</p>
+            </div>
+        </div>
 
-</div>
+    </div>
+
+</section>
 
 {% endblock %}

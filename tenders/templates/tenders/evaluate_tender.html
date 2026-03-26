@@ -8,12 +8,12 @@
 
 <h4 class="mb-4 text-primary">{{ tender.title }}</h4>
 
-<div class="card shadow">
+<div class="card shadow-lg border-0">
 <div class="card-body">
 
-<table class="table table-bordered table-striped align-middle">
+<table class="table table-hover table-bordered align-middle">
 
-<thead class="table-dark">
+<thead class="table-dark text-center">
 <tr>
 <th>Rank</th>
 <th>Vendor</th>
@@ -31,64 +31,66 @@
 <tr
 {% if tender.awarded_bid == bid %}
 class="table-success"
-{% elif forloop.first %}
+{% elif bid.rank == 1 %}
 class="table-warning"
 {% endif %}
 >
 
-<!-- 🥇 Rank -->
-<td>
-{% if forloop.first %}
-🥇 1
+<!-- 🥇 RANK -->
+<td class="text-center">
+{% if bid.rank == 1 %}
+<span class="badge bg-success">🥇 Best</span>
 {% else %}
-{{ forloop.counter }}
+#{{ bid.rank }}
 {% endif %}
 </td>
 
-<!-- Vendor -->
-<td>{{ bid.vendor.username }}</td>
+<!-- 👤 Vendor -->
+<td class="fw-semibold">{{ bid.vendor.username }}</td>
 
-<!-- Amount -->
-<td><strong>KES {{ bid.amount }}</strong></td>
+<!-- 💰 Amount -->
+<td class="text-center">
+<strong>KES {{ bid.amount }}</strong>
+</td>
 
-<!-- Proposal -->
-<td>
+<!-- 📄 Proposal -->
+<td class="text-center">
 {% if bid.proposal_document %}
-<a href="{{ bid.proposal_document.url }}" class="btn btn-sm btn-info">
-Download
+<a href="{{ bid.proposal_document.url }}" class="btn btn-sm btn-outline-info">
+<i class="fa fa-download"></i> Download
 </a>
 {% else %}
 <span class="text-muted">No document</span>
 {% endif %}
 </td>
 
-<!-- Date -->
-<td>{{ bid.created_at }}</td>
+<!-- 📅 Date -->
+<td class="text-center">{{ bid.created_at }}</td>
 
-<!-- Status / Action -->
-<td>
+<!-- ⚙️ STATUS / ACTION -->
+<td class="text-center">
 
 {% if tender.awarded_bid == bid %}
 
-<span class="badge bg-success">
+<span class="badge bg-success px-3 py-2">
 🏆 Winner
 </span>
 
 {% elif tender.awarded_bid %}
 
-<span class="badge bg-secondary">
+<span class="badge bg-secondary px-3 py-2">
 Lost
 </span>
 
-{% elif forloop.first %}
+{% elif bid.rank == 1 %}
 
 <a href="{% url 'award_bid' tender.id bid.id %}" class="btn btn-success btn-sm">
-Award Winner
+🏆 Award Winner
 </a>
 
 {% else %}
 
-<span class="badge bg-warning text-dark">
+<span class="badge bg-warning text-dark px-3 py-2">
 Competing
 </span>
 
@@ -101,7 +103,7 @@ Competing
 {% empty %}
 
 <tr>
-<td colspan="6" class="text-center">
+<td colspan="6" class="text-center text-muted">
 No bids submitted yet
 </td>
 </tr>

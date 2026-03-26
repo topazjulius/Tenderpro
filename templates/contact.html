@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- =============================== -->
+<!-- CONTACT HERO -->
+<!-- =============================== -->
+<div class="hero-section d-flex align-items-center justify-content-center text-center text-white">
+
+    <div>
+        <h1 class="fw-bold">Contact Us</h1>
+        <p class="lead">We'd love to hear from you. <br>
+            Our team is here to help you succeed.
+        </p>
+    </div>
+
+</div>
+
+
+<!-- =============================== -->
+<!-- CONTACT SECTION -->
+<!-- =============================== -->
+<div class="container my-5">
+
+    <div class="row g-5">
+
+        <!-- LEFT: CONTACT INFO -->
+        <div class="col-md-5">
+
+            <h3 class="fw-bold mb-4">Get in Touch</h3>
+
+            <p class="text-muted">
+                Have questions about tenders, bidding, or partnerships?
+                Reach out to us anytime.
+            </p>
+
+            <p><i class="fas fa-envelope me-2 text-primary"></i> support@tenderpro.com</p>
+            <p><i class="fas fa-phone me-2 text-success"></i> +254 700 000 000</p>
+            <p><i class="fas fa-map-marker-alt me-2 text-danger"></i> Nairobi, Kenya</p>
+
+        </div>
+
+        <!-- RIGHT: CONTACT FORM -->
+        <div class="col-md-7">
+
+            <div class="card shadow p-4">
+
+                <h4 class="mb-3">Send Message</h4>
+
+                <!-- SUCCESS MESSAGE -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-success">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label>Name</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Email</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Message</label>
+                        <textarea name="message" rows="5" class="form-control" required></textarea>
+                    </div>
+
+                    <button class="btn btn-primary w-100">
+                        Send Message
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

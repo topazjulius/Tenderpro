@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="card shadow p-4">
+
+        <h3>Apply for Tender</h3>
+        <hr>
+
+        <h5>{{ tender.title }}</h5>
+        <p>{{ tender.description }}</p>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label>Bid Amount (Ksh)</label>
+                <input type="number" name="amount" class="form-control" required>
+            </div>
+
+            <button class="btn btn-success">Submit Bid</button>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

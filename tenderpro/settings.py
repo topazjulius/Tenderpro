@@ -125,15 +125,20 @@ USE_TZ = True
 # ==============================
 # STATIC FILES (VERY IMPORTANT)
 # ==============================
-STATIC_URL = 'static/'
+
+# Base URL for static files
+STATIC_URL = '/static/'
+
+# Folder where Django will collect static files for production (Render)
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Prevent crash if /static folder doesn't exist
-STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
+# 📌 THIS is where your custom static files live (css, js, images)
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
 
-# WhiteNoise optimization
+# WhiteNoise (serves static files in production)
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 
 # ==============================
 # MEDIA FILES

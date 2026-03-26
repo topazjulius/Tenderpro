@@ -18,7 +18,7 @@ def tender_list(request):
     query = request.GET.get('q')
     filter_status = request.GET.get('status')
 
-    tenders = Tender.objects.all()
+    tenders = Tender.objects.all().order_by('-id')
 
     # 🔍 Search
     if query:
@@ -28,71 +28,76 @@ def tender_list(request):
     if filter_status == "open":
         tenders = tenders.filter(deadline__gt=timezone.now())
 
-    context = {
+    return render(request, 'tenders/tender_list.html', {
         'tenders': tenders,
         'query': query
-    }
-
-    return render(request, 'tenders/tender_list.html', context)
+    })
 
 
 # ===============================
-# TENDER DETAIL + BID SUBMISSION
+# TENDER DETAIL + BID SUBMISSION (FIXED 🔥)
 # ===============================
 @login_required
 def tender_detail(request, tender_id):
 
     tender = get_object_or_404(Tender, id=tender_id)
-    error = None
 
     if request.method == "POST":
 
+        # ❌ Prevent admin from bidding
+        if request.user.is_staff:
+            messages.error(request, "Admins cannot place bids.")
+            return redirect('tender_detail', tender_id=tender.id)
+
         # ❌ Closed tender
         if tender.deadline < timezone.now():
-            error = "This tender is already closed."
+            messages.error(request, "This tender is already closed.")
+            return redirect('tender_detail', tender_id=tender.id)
 
         # ❌ Duplicate bid
-        elif Bid.objects.filter(vendor=request.user, tender=tender).exists():
-            error = "You have already submitted a bid for this tender."
+        if Bid.objects.filter(vendor=request.user, tender=tender).exists():
+            messages.warning(request, "⚠️ You have already submitted a bid for this tender.")
+            return redirect('tender_detail', tender_id=tender.id)
 
-        else:
-            amount = request.POST.get("amount")
-            proposal_document = request.FILES.get("proposal_document")
+        amount = request.POST.get("amount")
+        proposal_document = request.FILES.get("proposal_document")
 
-            # ✅ Validate amount
-            if not amount:
-                error = "Please enter a valid bid amount."
-            else:
-                Bid.objects.create(
-                    vendor=request.user,
-                    tender=tender,
-                    amount=amount,
-                    proposal_document=proposal_document
-                )
+        # ❌ Validate amount
+        if not amount:
+            messages.error(request, "Please enter a valid bid amount.")
+            return redirect('tender_detail', tender_id=tender.id)
 
-                messages.success(request, "Bid submitted successfully!")
-                return redirect('tender_detail', tender_id=tender.id)
+        # ✅ CREATE BID
+        Bid.objects.create(
+            vendor=request.user,
+            tender=tender,
+            amount=amount,
+            proposal_document=proposal_document
+        )
 
-    context = {
-        'tender': tender,
-        'error': error
-    }
+        messages.success(request, "✅ Bid submitted successfully!")
+        return redirect('tender_detail', tender_id=tender.id)
 
-    return render(request, 'tenders/tender_detail.html', context)
+    return render(request, 'tenders/tender_detail.html', {
+        'tender': tender
+    })
 
 
 # ===============================
-# ADMIN BID EVALUATION PANEL
+# ADMIN BID EVALUATION PANEL (UPGRADED 🔥)
 # ===============================
 @staff_member_required
 def evaluate_tender(request, tender_id):
 
     tender = get_object_or_404(Tender, id=tender_id)
 
-    # 🔥 Sorted bids (lowest = best)
     bids = Bid.objects.filter(
         tender=tender
     ).select_related("vendor").order_by("amount")
+
+    # 🧠 Add ranking dynamically
+    for index, bid in enumerate(bids, start=1):
+        bid.rank = index
 
     context = {
         'tender': tender,
@@ -104,7 +109,7 @@ def evaluate_tender(request, tender_id):
 
 
 # ===============================
-# AWARD BID (ADMIN + EMAIL SYSTEM)
+# AWARD BID (UPGRADED 🔥)
 # ===============================
 @staff_member_required
 def award_bid(request, tender_id, bid_id):
@@ -117,7 +122,7 @@ def award_bid(request, tender_id, bid_id):
     tender.save()
 
     # ===============================
-    # 📧 EMAIL TO WINNER
+    # 📧 EMAIL WINNER
     # ===============================
     if winning_bid.vendor.email:
         send_mail(
@@ -125,17 +130,15 @@ def award_bid(request, tender_id, bid_id):
             message=f"""
 Hello {winning_bid.vendor.username},
 
-Congratulations! 🎉
+Congratulations!
 
 You have been awarded the tender:
 "{tender.title}"
 
-Your bid: {winning_bid.amount}
-
-Log in to your dashboard for more details.
+Your bid: KES {winning_bid.amount}
 
 Regards,
-Tender Management System
+TenderPro System
 """,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[winning_bid.vendor.email],
@@ -143,7 +146,7 @@ Tender Management System
         )
 
     # ===============================
-    # 📧 EMAIL TO LOSERS (OPTIONAL UPGRADE 🔥)
+    # 📧 EMAIL LOSERS (PRO FEATURE 🔥)
     # ===============================
     losing_bids = Bid.objects.filter(tender=tender).exclude(id=winning_bid.id)
 
@@ -154,28 +157,28 @@ Tender Management System
                 message=f"""
 Hello {bid.vendor.username},
 
-Thank you for participating in the tender:
+Thank you for participating in:
 "{tender.title}"
 
-Unfortunately, your bid was not selected this time.
+Unfortunately, your bid was not selected.
 
-We encourage you to apply for future tenders.
+Keep applying for future tenders.
 
-Best regards,
-Tender Management System
+Regards,
+TenderPro System
 """,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[bid.vendor.email],
                 fail_silently=True,
             )
 
-    messages.success(request, "Tender awarded and notifications sent!")
+    messages.success(request, "🏆 Tender awarded & notifications sent!")
 
     return redirect('evaluate_tender', tender_id=tender.id)
 
 
 # ===============================
-# VIEW ALL BIDS FOR A TENDER
+# VIEW ALL BIDS
 # ===============================
 @staff_member_required
 def tender_bids(request, tender_id):
@@ -186,9 +189,8 @@ def tender_bids(request, tender_id):
         tender=tender
     ).select_related("vendor").order_by("amount")
 
-    context = {
+    return render(request, "tenders/tender_bids.html", {
         "tender": tender,
         "bids": bids
-    }
-
-    return render(request, "tenders/tender_bids.html", context)
+        
+    })

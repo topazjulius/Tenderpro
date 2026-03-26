@@ -4,107 +4,116 @@
 
 <div class="container mt-5">
 
-```
-<!-- Tender Information -->
-<div class="card shadow-sm mb-4">
-    <div class="card-body">
+    <!-- 🔔 MESSAGES (VERY IMPORTANT) -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
 
-        <h2 class="mb-3">{{ tender.title }}</h2>
 
-        <p class="text-muted">
-            {{ tender.description }}
+    <!-- =============================== -->
+    <!-- TENDER INFORMATION -->
+    <!-- =============================== -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+
+            <h2 class="mb-3">{{ tender.title }}</h2>
+
+            <p class="text-muted">
+                {{ tender.description }}
+            </p>
+
+            <p>
+                <strong>Deadline:</strong>
+                <span class="badge bg-danger">
+                    {{ tender.deadline }}
+                </span>
+
+                {% if tender.deadline > now %}
+                    <span class="badge bg-success">OPEN</span>
+                {% else %}
+                    <span class="badge bg-secondary">CLOSED</span>
+                {% endif %}
+            </p>
+
+            {% if tender.document %}
+                <a href="{{ tender.document.url }}" class="btn btn-primary">
+                    <i class="fas fa-download"></i> Download Tender Document
+                </a>
+            {% endif %}
+
+        </div>
+    </div>
+
+
+    <!-- =============================== -->
+    <!-- WINNER DISPLAY -->
+    <!-- =============================== -->
+    {% if tender.awarded_bid %}
+
+    <div class="alert alert-success shadow-sm">
+
+        <h4>🏆 Tender Awarded</h4>
+
+        <p>
+            <strong>Winning Vendor:</strong>
+            {{ tender.awarded_bid.vendor.username }}
         </p>
 
         <p>
-            <strong>Deadline:</strong>
-            <span class="badge bg-danger">
-                {{ tender.deadline }}
-            </span>
-
-            {% if tender.is_open %}
-                <span class="badge bg-success">OPEN</span>
-            {% else %}
-                <span class="badge bg-secondary">CLOSED</span>
-            {% endif %}
+            <strong>Winning Amount:</strong>
+            KES {{ tender.awarded_bid.amount }}
         </p>
 
-        {% if tender.document %}
-            <a href="{{ tender.document.url }}" class="btn btn-primary">
-                Download Tender Document
-            </a>
-        {% endif %}
-
     </div>
-</div>
+
+    {% endif %}
 
 
-<!-- WINNING BID DISPLAY -->
-{% if tender.awarded_bid %}
+    <!-- =============================== -->
+    <!-- BID SUBMISSION -->
+    <!-- =============================== -->
+    {% if tender.deadline > now %}
 
-<div class="alert alert-success shadow-sm">
+    <div class="card shadow-lg">
+        <div class="card-body">
 
-    <h4>🏆 Tender Awarded</h4>
+            <h4 class="mb-3">Submit Your Bid</h4>
 
-    <p>
-        <strong>Winning Vendor:</strong>
-        {{ tender.awarded_bid.vendor.username }}
-    </p>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
 
-    <p>
-        <strong>Winning Amount:</strong>
-        Ksh {{ tender.awarded_bid.amount }}
-    </p>
+                <div class="mb-3">
+                    <label class="form-label">Bid Amount (KES)</label>
+                    <input type="number" name="amount" class="form-control" required>
+                </div>
 
-</div>
+                <div class="mb-3">
+                    <label class="form-label">Upload Proposal Document</label>
+                    <input type="file" name="proposal_document" class="form-control">
+                </div>
 
-{% endif %}
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-paper-plane"></i> Submit Bid
+                </button>
 
+            </form>
 
-<!-- Bid Submission -->
-{% if tender.is_open %}
-
-<div class="card shadow-lg">
-    <div class="card-body">
-
-        <h4 class="mb-3">Submit Your Bid</h4>
-
-        <!-- ERROR MESSAGE DISPLAY -->
-        {% if error %}
-        <div class="alert alert-danger">
-            {{ error }}
         </div>
-        {% endif %}
-
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-
-            <div class="mb-3">
-                <label class="form-label">Bid Amount</label>
-                <input type="number" name="amount" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Upload Proposal Document</label>
-                <input type="file" name="proposal_document" class="form-control">
-            </div>
-
-            <button type="submit" class="btn btn-success">
-                Submit Bid
-            </button>
-
-        </form>
-
     </div>
-</div>
 
-{% else %}
+    {% else %}
 
-<div class="alert alert-warning">
-    This tender is closed. Bidding is no longer allowed.
-</div>
+    <div class="alert alert-warning shadow-sm">
+        <i class="fas fa-exclamation-triangle"></i>
+        This tender is closed. Bidding is no longer allowed.
+    </div>
 
-{% endif %}
-```
+    {% endif %}
 
 </div>
 

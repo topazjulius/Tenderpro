@@ -19,4 +19,12 @@ urlpatterns = [
     # TENDER DETAIL (PUT LAST ⚠️)
     # ===============================
     path('<int:tender_id>/', views.tender_detail, name='tender_detail'),
+
+    path('prequalification/apply/', views.apply_prequalification, name='apply_prequalification'),
+
+    path('institution/<int:institution_id>/', views.tenders_by_institution, name='tenders_by_institution'),
+
+path('category/<int:category_id>/', views.tenders_by_category, name='tenders_by_category'),
+
+path('awarded/', views.awarded_tenders, name='awarded_tenders'),
 ]

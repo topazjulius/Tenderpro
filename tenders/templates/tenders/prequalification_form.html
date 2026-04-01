@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="card shadow-sm p-4">
+
+        <h3 class="fw-bold mb-4 text-center">
+            Apply for Prequalification
+        </h3>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label>Company Name</label>
+                <input type="text" name="company_name" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label>Category</label>
+                <select name="category" class="form-select" required>
+                    <option value="university">University Suppliers</option>
+                    <option value="government">Government Vendors</option>
+                    <option value="private">Private Sector</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label>Description</label>
+                <textarea name="description" class="form-control" rows="4"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label>Supporting Document</label>
+                <input type="file" name="document" class="form-control">
+            </div>
+
+            <button class="btn btn-primary w-100">
+                🚀 Submit Application
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

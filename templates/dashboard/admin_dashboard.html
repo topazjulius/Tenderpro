@@ -127,4 +127,21 @@ display: true
 
 </script>
 
+<canvas id="bidsChart" height="100"></canvas>
+
+<script>
+const ctx = document.getElementById('bidsChart');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ vendor_names_json|safe }},
+        datasets: [{
+            label: 'Number of Bids per Vendor',
+            data: {{ vendor_bids_json|safe }},
+        }]
+    },
+});
+</script>
+
 {% endblock %}

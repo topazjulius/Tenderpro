@@ -1,60 +1,77 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.admin.views.decorators import staff_member_required
 from accounts.decorators import vendor_required, admin_required
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
+import json
 
 from bids.models import Bid
 from tenders.models import Tender
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.conf import settings
+from .models import Notification
 
 
 # ===============================
 # HOME
 # ===============================
 def home(request):
-   context = {
-        "total_tenders": Tender.objects.filter(deadline__gte=timezone.now()).count(),
-        "total_vendors": User.objects.filter(is_staff=False).count(),
-        "total_awards": Tender.objects.filter(awarded_bid__isnull=False).count(),
-    }
-   return render(request, "home.html", context)
+
+    notifications = []
+    unread_count = 0
+
+    if request.user.is_authenticated:
+        notifications = Notification.objects.filter(
+            user=request.user
+        ).order_by('-created_at')[:5]
+
+        unread_count = Notification.objects.filter(
+            user=request.user,
+            is_read=False
+        ).count()
+
+    return render(request, "home.html", {
+        "notifications": notifications,
+        "unread_count": unread_count,
+    })
 
 
 # ===============================
-# VENDOR DASHBOARD (USER SIDE)
+# VENDOR DASHBOARD (🔥 UPGRADED)
 # ===============================
 @login_required
 @vendor_required
 def vendor_dashboard(request):
 
-    # Redirect admin to admin dashboard
     if request.user.is_staff:
         return redirect("admin_dashboard")
 
-    user_bids = Bid.objects.filter(
-        vendor=request.user
-    ).select_related("tender")
+    user = request.user
 
     # ===============================
-    # KPI STATS (FIXED ✅)
+    # 📊 STATS
     # ===============================
+    user_bids = Bid.objects.filter(
+        vendor=user
+    ).select_related("tender")
+
     total_tenders = Tender.objects.count()
     total_bids = user_bids.count()
+
     open_tenders = Tender.objects.filter(
         deadline__gte=timezone.now()
     ).count()
 
-    awarded_tenders = Tender.objects.filter(
-        awarded_bid__isnull=False
+    # ✅ FIXED: Only count awards WON by this user
+    awards = Bid.objects.filter(
+        vendor=user,
+        tender__awarded_bid__vendor=user
     ).count()
 
     # ===============================
-    # BID DATA
+    # 📌 BID DATA + STATUS
     # ===============================
     bid_data = []
 
@@ -75,29 +92,29 @@ def vendor_dashboard(request):
             "submitted_at": bid.submitted_at
         })
 
-    # ✅ FIX: Added KPI data to context
-    context = {
+    # ===============================
+    # 📌 RECENT ACTIVITY (🔥 NEW)
+    # ===============================
+    recent_bids = user_bids.order_by('-submitted_at')[:5]
+
+    return render(request, "dashboard/dashboard.html", {
         "bid_data": bid_data,
         "total_tenders": total_tenders,
         "total_bids": total_bids,
         "open_tenders": open_tenders,
-        "awarded_tenders": awarded_tenders,
-    }
-
-    return render(request, "dashboard/dashboard.html", context)
+        "awards": awards,
+        "recent_bids": recent_bids,  # 🔥 NEW
+    })
 
 
 # ===============================
-# ADMIN DASHBOARD (ENTERPRISE UI)
+# ADMIN DASHBOARD
 # ===============================
 @admin_required
 def admin_dashboard(request):
 
     now = timezone.now()
 
-    # ===============================
-    # KPI STATS
-    # ===============================
     total_tenders = Tender.objects.count()
     total_vendors = User.objects.filter(is_staff=False).count()
     total_bids = Bid.objects.count()
@@ -111,9 +128,6 @@ def admin_dashboard(request):
         deadline__gte=now
     ).count()
 
-    # ===============================
-    # TENDER STATUS
-    # ===============================
     open_tenders = Tender.objects.filter(
         deadline__gte=now
     ).count()
@@ -122,9 +136,6 @@ def admin_dashboard(request):
         deadline__lt=now
     ).count()
 
-    # ===============================
-    # VENDOR PERFORMANCE (CHART)
-    # ===============================
     vendors = User.objects.filter(is_staff=False)
 
     vendor_names = []
@@ -132,18 +143,14 @@ def admin_dashboard(request):
 
     for vendor in vendors:
         count = Bid.objects.filter(vendor=vendor).count()
-
         vendor_names.append(vendor.username)
         vendor_bids.append(count)
 
-    # ===============================
-    # RECENT TENDERS
-    # ===============================
+    vendor_names_json = json.dumps(vendor_names)
+    vendor_bids_json = json.dumps(vendor_bids)
+
     recent_tenders = Tender.objects.all().order_by('-id')[:5]
 
-    # ===============================
-    # RECENT ACTIVITY
-    # ===============================
     recent_bids = Bid.objects.select_related(
         "vendor", "tender"
     ).order_by('-submitted_at')[:5]
@@ -157,38 +164,26 @@ def admin_dashboard(request):
             "time": bid.submitted_at
         })
 
-    # ===============================
-    # CONTEXT
-    # ===============================
-    context = {
-        # KPIs
+    return render(request, "dashboard/admin_dashboard.html", {
         "total_tenders": total_tenders,
         "total_vendors": total_vendors,
         "total_bids": total_bids,
         "awarded_tenders": awarded_tenders,
         "closing_soon": closing_soon,
-
-        # Charts
         "vendor_names": vendor_names,
         "vendor_bids": vendor_bids,
+        "vendor_names_json": vendor_names_json,
+        "vendor_bids_json": vendor_bids_json,
         "open_tenders": open_tenders,
         "closed_tenders": closed_tenders,
-
-        # Tables
         "recent_tenders": recent_tenders,
-
-        # Activity
         "activity_feed": activity_feed,
-
-        # Time
         "now": now,
-    }
-
-    return render(request, "dashboard/admin_dashboard.html", context)
+    })
 
 
 # ===============================
-# VENDOR PERFORMANCE DASHBOARD
+# VENDOR PERFORMANCE
 # ===============================
 @admin_required
 def vendor_performance(request):
@@ -206,9 +201,7 @@ def vendor_performance(request):
             tender__awarded_bid__vendor=vendor
         ).count()
 
-        win_rate = 0
-        if total_bids > 0:
-            win_rate = (wins / total_bids) * 100
+        win_rate = (wins / total_bids * 100) if total_bids > 0 else 0
 
         vendor_data.append({
             "vendor": vendor,
@@ -217,11 +210,41 @@ def vendor_performance(request):
             "win_rate": round(win_rate, 1)
         })
 
-    context = {
+    return render(request, "vendor_performance.html", {
         "vendor_data": vendor_data
-    }
+    })
 
-    return render(request, "vendor_performance.html", context)
+
+# ===============================
+# 🔔 VIEW NOTIFICATIONS
+# ===============================
+@login_required
+def notifications_view(request):
+
+    notifications = Notification.objects.filter(
+        user=request.user
+    ).order_by('-created_at')
+
+    notifications.update(is_read=True)
+
+    return render(request, "dashboard/notifications.html", {
+        "notifications": notifications
+    })
+
+
+# ===============================
+# MARK NOTIFICATIONS READ
+# ===============================
+@login_required
+def mark_notifications_read(request):
+
+    Notification.objects.filter(
+        user=request.user,
+        is_read=False
+    ).update(is_read=True)
+
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
 
 # ===============================
 # ABOUT PAGE
@@ -229,5 +252,33 @@ def vendor_performance(request):
 def about(request):
     return render(request, "about.html")
 
+
+# ===============================
+# CONTACT PAGE
+# ===============================
 def contact(request):
+
+    if request.method == "POST":
+
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        message_body = request.POST.get("message")
+
+        send_mail(
+            subject=f"New Contact Message from {name}",
+            message=f"""
+Name: {name}
+Email: {email}
+
+Message:
+{message_body}
+""",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[settings.DEFAULT_FROM_EMAIL],
+            fail_silently=True,
+        )
+
+        messages.success(request, "✅ Your message has been sent successfully!")
+        return redirect("contact")
+
     return render(request, "contact.html")

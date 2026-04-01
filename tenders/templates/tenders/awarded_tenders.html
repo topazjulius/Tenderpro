@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <h2 class="fw-bold mb-4 text-center">
+        🏆 Awarded Tenders
+    </h2>
+
+    {% for tender in tenders %}
+
+        <div class="card shadow-sm p-3 mb-3">
+
+            <h5 class="fw-bold">{{ tender.title }}</h5>
+
+            <p class="mb-1">
+                <strong>Institution:</strong> {{ tender.institution.name }}
+            </p>
+
+            <p class="mb-1">
+                <strong>Winner:</strong> {{ tender.awarded_bid.vendor.username }}
+            </p>
+
+            <p>
+                <strong>Winning Bid:</strong> KES {{ tender.awarded_bid.amount }}
+            </p>
+
+        </div>
+
+    {% empty %}
+
+        <div class="alert alert-info text-center">
+            No awarded tenders yet.
+        </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

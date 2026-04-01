@@ -1,51 +1,100 @@
 /* =========================
-   GLOBAL STYLING
+   PREMIUM COLOR SYSTEM 🎨
 ========================= */
-
-body {
-    background-color: #f5f7fa;
+:root {
+    --primary: #4f46e5;
+    --secondary: #06b6d4;
+    --dark: #0f172a;
+    --light: #f8fafc;
+    --accent: #22c55e;
+}
+html { 
+    scroll-behavior: smooth;
 }
 
 /* =========================
-   HERO BACKGROUND
+   GLOBAL STYLING
+========================= */
+body {
+    background-color: #f5f7fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+/* =========================
+   HERO (HOME)
 ========================= */
 .hero-section {
     height: 90vh;
-
-    background: linear-gradient(
-        rgba(0,0,0,0.7),
-        rgba(0,0,0,0.6)
-    ),
-    url("/static/images/hero.jpg");
-
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.6)),
+                url("/static/images/hero.jpg");
     background-size: cover;
     background-position: center;
     color: white;
 }
 
-/* HERO TEXT SHADOW */
-.hero-section h1,
-.hero-section p {
-    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-}
 
 /* =========================
-   GLASS CARD (STATS)
+   TENDERS HERO (FIXED 🔥)
 ========================= */
-.stats-card {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(12px);
-    border-radius: 15px;
+.tenders-hero {
+    position: relative;
+    z-index: 1;
+
+   background:
+        linear-gradient(rgba(15,23,42,0.85), rgba(79,70,229,0.75)),
+                url("/static/images/tender-bg.jpg");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    animation: fadeInUp 1s ease-in-out;
+
+    height: 85vh;
+    min-height: 400px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
     color: white;
-    transition: 0.3s;
 }
 
-.stats-card:hover {
-    transform: translateY(-5px);
+/* Content inside hero */
+.tenders-hero .hero-content {
+    position: relative;
+    z-index: 2;
 }
+
+/* Text */
+.tenders-hero h1 {
+    letter-spacing: 1px;
+}
+
+.tenders-hero p {
+    max-width: 650px;
+    margin: auto;
+    opacity: 0.95;
+}
+
 
 /* =========================
-   BUTTON IMPROVEMENT
+   TENDER DETAIL HERO
+========================= */
+.tender-detail-hero {
+    height: 35vh;
+
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                url("/static/images/tender-bg.jpg");
+
+    background-size: cover;
+    background-position: center;
+}
+
+
+/* =========================
+   BUTTONS
 ========================= */
 .btn-primary {
     background: linear-gradient(45deg, #2563eb, #4f46e5);
@@ -56,8 +105,107 @@ body {
     opacity: 0.9;
 }
 
+/* Updated to match new class */
+.tenders-hero .btn-light,
+.tenders-hero .btn-outline-light {
+    border-radius: 30px;
+    transition: all 0.3s ease;
+}
+
+.tenders-hero .btn-light:hover,
+.tenders-hero .btn-outline-light:hover {
+    transform: translateY(-3px);
+}
+
+
 /* =========================
-   IMAGE HOVER EFFECT
+   GLASS CARD
+========================= */
+.stats-card {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(12px);
+    border-radius: 15px;
+    color: white;
+    transition: 0.3s;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+}
+
+
+/* =========================
+   CARDS
+========================= */
+.card {
+    border-radius: 18px;
+    border: none;
+    overflow: hidden;
+
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(12px);
+
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.tender-card {
+    position: relative;
+    border-left: 5px solid var(--primary);
+}
+
+.tender-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: 0.3s;
+    background: linear-gradient(to right, rgba(79,70,229,0.05), transparent);
+}
+
+.tender-card:hover::before {
+    opacity: 1;
+}
+/* =========================
+   ABOUT HERO
+========================= */
+.about-hero {
+    height: 250px;
+    background: linear-gradient(rgba(13,59,102,0.85), rgba(13,59,102,0.85)),
+                url("/static/images/about.jpg");
+
+    background-size: cover;
+    background-position: center;
+}
+
+
+/* =========================
+   CONTACT HERO
+========================= */
+.contact-hero {
+    height: 60vh;
+    background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+                url("/static/images/hero.jpg");
+
+    background-size: cover;
+    background-position: center;
+}
+
+
+/* =========================
+   FORM
+========================= */
+.form-control {
+    border-radius: 10px;
+}
+
+
+/* =========================
+   IMAGE HOVER
 ========================= */
 img {
     transition: 0.3s;
@@ -67,68 +215,218 @@ img:hover {
     transform: scale(1.02);
 }
 
-/* =========================
-   ABOUT HERO SECTION
-========================= */
-.about-hero {
-    height: 250px;
-    background: linear-gradient(rgba(13,59,102,0.85), rgba(13,59,102,0.85)),
-                url("/static/images/about.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
 
 /* =========================
-   ABOUT PAGE STYLING
+   TEXT
 ========================= */
-
-/* Section spacing */
-.container {
-    max-width: 1100px;
-}
-
-/* Cards */
-.card {
-    border-radius: 12px;
-    transition: all 0.3s ease-in-out;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
-
-/* Section-specific cards */
-.section-card {
-    background-color: #ffffff;
-    border-radius: 12px;
-    padding: 25px;
-}
-
-/* Headings */
-h3 {
-    color: #0d3b66;
-    font-weight: 700;
-}
-
-/* Text improvements */
 .text-muted {
     font-size: 15px;
     line-height: 1.7;
 }
 
-/* Lists */
-ul {
-    padding-left: 20px;
+
+/* =========================
+   ANIMATION
+========================= */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-ul li {
-    margin-bottom: 10px;
+/* =========================
+   CTA SECTION 🔥
+========================= */
+.cta-section {
+    height: 50vh;
+
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
 }
 
-/* Centered paragraph control */
-.text-center p {
+/* TEXT */
+.cta-section h1 {
+    font-size: 2.5rem;
+}
+
+.cta-section p {
     max-width: 700px;
     margin: auto;
+    opacity: 0.95;
+}
+
+/* BUTTONS */
+.cta-section .btn-light {
+    border-radius: 30px;
+    transition: 0.3s;
+}
+
+.cta-section .btn-outline-light {
+    border-radius: 30px;
+    transition: 0.3s;
+}
+
+.cta-section .btn:hover {
+    transform: translateY(-3px);
+}
+/* =========================
+   ANIMATIONS (NEXT LEVEL 🔥)
+========================= */
+
+/* Fade In */
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+}
+
+/* Visible state */
+.fade-in.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* CTA ANIMATED GRADIENT */
+.cta-section {
+    background: linear-gradient(270deg, #2563eb, #7c3aed, #9333ea);
+    background-size: 600% 600%;
+    animation: gradientMove 10s ease infinite;
+}
+
+/* Gradient animation */
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+
+/* BUTTON HOVER (MORE PREMIUM) */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    border-radius: 25px;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(79,70,229,0.4);
+}
+
+
+/* CARD HOVER ENHANCEMENT */
+.card:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+/* =========================
+   DASHBOARD CARDS
+========================= */
+.dashboard-card {
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+/* =========================
+   DASHBOARD HEADER
+========================= */
+.dashboard-header {
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* =========================
+   KPI CARDS IMPROVED
+========================= */
+.card {
+    border-radius: 16px;
+}
+
+.card i {
+    transition: 0.3s;
+}
+
+.card:hover i {
+    transform: scale(1.2);
+}
+
+/* =========================
+   TABLE IMPROVEMENT
+========================= */
+.table {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table tbody tr:hover {
+    background-color: #f1f5f9;
+    transition: 0.2s;
+}
+
+/* =========================
+   BADGES
+========================= */
+.badge {
+    font-size: 13px;
+    border-radius: 20px;
+}
+
+/* =========================
+   NOTIFICATION CARD
+========================= */
+.notification-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.navbar {
+    backdrop-filter: blur(10px);
+    background: rgba(5, 72, 230, 0.85) !important;
+}
+
+.navbar .nav-link {
+    transition: 0.3s;
+}
+
+.navbar .nav-link:hover {
+    color: var(--secondary) !important;
+}
+
+.container {
+    position: relative;
+    z-index: 2;
+    animation: fadeInUp 0.6s ease;
+}
+.container {
+    margin-top: 15px;
+}
+
+/* FIX CLICK ISSUES */
+a, button {
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+.card, .container {
+    position: relative;
+    z-index: 1;
 }

@@ -1,52 +1,177 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 
-<h2 class="mb-4">Available Tenders</h2>
+<!-- =============================== -->
+<!-- HERO SECTION -->
+<!-- =============================== -->
+<section class="tender-hero" style="position: relative; z-index:1;">
 
-<div class="row">
+    <div class="hero-content container text-center">
 
-{% for tender in tenders %}
+        <h1 class="display-4 fw-bold mb-3">
+            Procurement Opportunities
+        </h1>
 
-<div class="col-md-6">
+        <p class="lead mb-4">
+            Discover active tenders from institutions across Kenya.
+        </p>
 
-<div class="card mb-4 shadow-sm">
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
 
-<div class="card-body">
+            <a href="#tender-list" class="btn btn-light btn-lg px-4 shadow-sm">
+                Browse Tenders
+            </a>
 
-<h4>{{ tender.title }}</h4>
+        </div>
 
-<p>{{ tender.description }}</p>
+    </div>
 
-<p>
-<strong>Deadline:</strong> {{ tender.deadline }}
-</p>
+</section>
 
-<p>
-<strong>Status:</strong>
 
-{% if tender.is_open %}
-<span class="badge bg-success">OPEN</span>
-{% else %}
-<span class="badge bg-danger">CLOSED</span>
-{% endif %}
+<!-- =============================== -->
+<!-- SEARCH + FILTER -->
+<!-- =============================== -->
+<div class="container mt-5">
 
-</p>
+    <div class="card shadow-sm border-0 p-3 mb-4">
 
-<a href="{% url 'tender_detail' tender.id %}" class="btn btn-primary">
-View Tender
-</a>
-<a href="{% url 'place_bid' tender.id %}" class="btn btn-success">
-Apply
-</a>
+        <form method="GET" class="row g-2 align-items-center">
+
+            <!-- Search -->
+            <div class="col-md-4">
+                <input 
+                    type="text" 
+                    name="q" 
+                    value="{{ request.GET.q }}" 
+                    class="form-control" 
+                    placeholder="Search tenders..."
+                >
+            </div>
+
+            <!-- Status -->
+            <div class="col-md-2">
+                <select name="status" class="form-select">
+                    <option value="">All</option>
+                    <option value="open" {% if request.GET.status == "open" %}selected{% endif %}>
+                        Open Only
+                    </option>
+                </select>
+            </div>
+
+            <!-- Institution -->
+            <div class="col-md-2">
+                <select name="institution" class="form-select">
+                    <option value="">All Institutions</option>
+                    {% for inst in institutions %}
+                        <option value="{{ inst.id }}"
+                            {% if selected_institution == inst.id|stringformat:"s" %}selected{% endif %}>
+                            {{ inst.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Category -->
+            <div class="col-md-2">
+                <select name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}"
+                            {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>
+                            {{ cat.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Button -->
+            <div class="col-md-2 d-grid">
+                <button class="btn btn-primary">
+                    Filter
+                </button>
+            </div>
+
+        </form>
+
+    </div>
 
 </div>
 
-</div>
 
-</div>
+<!-- =============================== -->
+<!-- TENDERS LIST -->
+<!-- =============================== -->
+<div class="container" id="tender-list">
 
-{% endfor %}
+    <h2 class="mb-4 fw-bold text-center">Available Tenders</h2>
+
+    <div class="row g-4">
+
+        {% for tender in tenders %}
+
+        <div class="col-md-6">
+
+            <div class="card h-100 border-0 shadow-sm" style="position:relative; z-index:1;">
+
+                <div class="card-body">
+
+                    <h4 class="fw-bold mb-2">{{ tender.title }}</h4>
+
+                    <p class="text-muted">
+                        {{ tender.description|truncatewords:20 }}
+                    </p>
+
+                    <p class="mb-2">
+                        <strong>Deadline:</strong> {{ tender.deadline }}
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong>
+
+                        {% if tender.deadline > now %}
+                        <span class="badge bg-success">OPEN</span>
+                        {% else %}
+                        <span class="badge bg-danger">CLOSED</span>
+                        {% endif %}
+
+                    </p>
+
+                    <div class="d-flex gap-2 mt-3">
+
+                        <!-- VIEW -->
+                        <a href="{% url 'tender_detail' tender.id %}" 
+                           class="btn btn-outline-primary w-50">
+                            View
+                        </a>
+
+                        <!-- APPLY -->
+                        <a href="{% url 'tender_detail' tender.id %}" 
+                           class="btn btn-success w-50">
+                            Apply
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <div class="col-12 text-center">
+            <div class="alert alert-info">
+                No tenders available at the moment.
+            </div>
+        </div>
+
+        {% endfor %}
+
+    </div>
 
 </div>
 

@@ -1,119 +1,155 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 
+<!-- =============================== -->
+<!-- HERO SECTION -->
+<!-- =============================== -->
+<section class="tender-detail-hero text-white d-flex align-items-center">
+
+    <div class="container text-center">
+        <h1 class="display-5 fw-bold">{{ tender.title }}</h1>
+        <p class="lead">Detailed tender information and bidding portal</p>
+    </div>
+
+</section>
+
+<!-- =============================== -->
+<!-- MAIN CONTENT -->
+<!-- =============================== -->
 <div class="container mt-5">
 
-    <!-- 🔔 MESSAGES (VERY IMPORTANT) -->
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="row g-4">
+
+        <!-- LEFT SIDE -->
+        <div class="col-lg-8">
+
+            <!-- Tender Info -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+
+                    <h4 class="fw-bold mb-3">📄 Tender Description</h4>
+
+                    <p class="text-muted">
+                        {{ tender.description }}
+                    </p>
+
+                </div>
             </div>
-        {% endfor %}
-    {% endif %}
 
+            <!-- Tender Details -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
 
-    <!-- =============================== -->
-    <!-- TENDER INFORMATION -->
-    <!-- =============================== -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
+                    <h5 class="fw-bold mb-3">📊 Key Details</h5>
 
-            <h2 class="mb-3">{{ tender.title }}</h2>
+                    <ul class="list-group list-group-flush">
 
-            <p class="text-muted">
-                {{ tender.description }}
-            </p>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span><strong>Deadline</strong></span>
+                            <span class="text-danger">{{ tender.deadline }}</span>
+                        </li>
 
-            <p>
-                <strong>Deadline:</strong>
-                <span class="badge bg-danger">
-                    {{ tender.deadline }}
-                </span>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span><strong>Status</strong></span>
+                            {% if tender.is_open %}
+                                <span class="badge bg-success">OPEN</span>
+                            {% else %}
+                                <span class="badge bg-secondary">CLOSED</span>
+                            {% endif %}
+                        </li>
 
-                {% if tender.deadline > now %}
-                    <span class="badge bg-success">OPEN</span>
-                {% else %}
-                    <span class="badge bg-secondary">CLOSED</span>
-                {% endif %}
-            </p>
+                        {% if tender.awarded_bid %}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span><strong>Winner</strong></span>
+                            <span class="text-success">
+                                {{ tender.awarded_bid.vendor.username }}
+                            </span>
+                        </li>
+                        {% endif %}
 
+                    </ul>
+
+                </div>
+            </div>
+
+            <!-- Document -->
             {% if tender.document %}
-                <a href="{{ tender.document.url }}" class="btn btn-primary">
-                    <i class="fas fa-download"></i> Download Tender Document
-                </a>
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body text-center">
+
+                    <h5 class="fw-bold mb-3">📥 Tender Document</h5>
+
+                    <a href="{{ tender.document.url }}" class="btn btn-primary btn-lg">
+                        Download Document
+                    </a>
+
+                </div>
+            </div>
             {% endif %}
 
         </div>
-    </div>
 
+        <!-- RIGHT SIDE -->
+        <div class="col-lg-4">
 
-    <!-- =============================== -->
-    <!-- WINNER DISPLAY -->
-    <!-- =============================== -->
-    {% if tender.awarded_bid %}
+            <!-- Bid Card -->
+            <div class="card shadow-lg border-0">
 
-    <div class="alert alert-success shadow-sm">
+                <div class="card-body">
 
-        <h4>🏆 Tender Awarded</h4>
+                    <h4 class="fw-bold mb-3 text-center">💰 Submit Your Bid</h4>
 
-        <p>
-            <strong>Winning Vendor:</strong>
-            {{ tender.awarded_bid.vendor.username }}
-        </p>
+                    <!-- CLOSED -->
+                    {% if not tender.is_open %}
+                        <div class="alert alert-warning text-center">
+                            ❌ This tender is closed
+                        </div>
 
-        <p>
-            <strong>Winning Amount:</strong>
-            KES {{ tender.awarded_bid.amount }}
-        </p>
+                    <!-- ALREADY BID -->
+                    {% elif has_bid %}
+                        <div class="alert alert-info text-center">
+                            ⚠️ You have already submitted a bid
+                        </div>
 
-    </div>
+                    <!-- FORM -->
+                    {% else %}
 
-    {% endif %}
+                    {% if request.user.vendorprofile.trust_score < 50 %}
+                       <div class="alert alert-danger">
+                             ⚠️ Your account has low trust score. Your bids may be reviewed.
+                        </div>
+                    {% endif %}
 
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
 
-    <!-- =============================== -->
-    <!-- BID SUBMISSION -->
-    <!-- =============================== -->
-    {% if tender.deadline > now %}
+                            <div class="mb-3">
+                                <label class="form-label">Bid Amount (KES)</label>
+                                <input type="number" name="amount" class="form-control" required>
+                            </div>
 
-    <div class="card shadow-lg">
-        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Proposal Document</label>
+                                <input type="file" name="proposal_document" class="form-control">
+                            </div>
 
-            <h4 class="mb-3">Submit Your Bid</h4>
+                            <button class="btn btn-success w-100">
+                                🚀 Submit Bid
+                            </button>
 
-            <form method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
+                        </form>
 
-                <div class="mb-3">
-                    <label class="form-label">Bid Amount (KES)</label>
-                    <input type="number" name="amount" class="form-control" required>
+                    {% endif %}
+
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Upload Proposal Document</label>
-                    <input type="file" name="proposal_document" class="form-control">
-                </div>
-
-                <button type="submit" class="btn btn-success">
-                    <i class="fas fa-paper-plane"></i> Submit Bid
-                </button>
-
-            </form>
+            </div>
 
         </div>
+
     </div>
-
-    {% else %}
-
-    <div class="alert alert-warning shadow-sm">
-        <i class="fas fa-exclamation-triangle"></i>
-        This tender is closed. Bidding is no longer allowed.
-    </div>
-
-    {% endif %}
 
 </div>
 

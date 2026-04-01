@@ -20,8 +20,8 @@
                 </h1>
 
                 <p class="lead mt-3">
-                    Connect with Higher learning Institutions both public $ private universities, and College tenders.
-                    Submit bids, track performance, and win contracts — all in one place.
+                    Connect with higher learning institutions including public & private universities and colleges.
+                    Discover tenders, submit bids, track performance, and win contracts — all in one place.
                 </p>
 
                 <div class="mt-4">
@@ -29,7 +29,7 @@
                         🚀 Explore Tenders
                     </a>
 
-                    <a href="#" class="btn btn-outline-light btn-lg px-4">
+                    <a href="#how-it-works" class="btn btn-outline-light btn-lg px-4">
                         ▶ How It Works
                     </a>
                 </div>
@@ -72,6 +72,7 @@
 
 </section>
 
+
 <!-- =============================== -->
 <!-- ABOUT SECTION -->
 <!-- =============================== -->
@@ -79,32 +80,27 @@
 
     <div class="row align-items-center">
 
-        <!-- LEFT (IMAGE) -->
         <div class="col-md-6">
             <img src="{% static 'images/about.jpg' %}" 
                  class="img-fluid rounded shadow" 
                  alt="About TenderPro">
         </div>
 
-        <!-- RIGHT (TEXT) -->
         <div class="col-md-6">
 
-            <h2 class="fw-bold mb-3">
-                About TenderPro
-            </h2>
+            <h2 class="fw-bold mb-3">About TenderPro</h2>
 
             <p class="text-muted">
                 TenderPro is a modern digital procurement platform designed to simplify 
-                how organizations and vendors interact. We connect suppliers with 
-                government institutions, universities, and private sector opportunities.
+                how institutions and suppliers interact within the education sector.
             </p>
 
             <p class="text-muted">
-                Our system ensures transparency, efficiency, and fairness in the bidding 
-                process while giving vendors powerful tools to track performance and win more contracts.
+                We connect vendors with universities and colleges, ensuring transparency,
+                efficiency, and fairness in tendering while empowering suppliers to win more contracts.
             </p>
 
-            <a href="/tenders/" class="btn btn-primary mt-3 px-4">
+            <a href="{% url 'tender_list' %}" class="btn btn-primary mt-3 px-4">
                 Explore Opportunities
             </a>
 
@@ -149,6 +145,93 @@
                 <h5 class="fw-bold">Secure System</h5>
                 <p class="text-muted">Safe and transparent procurement process</p>
             </div>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =============================== -->
+<!-- HOW IT WORKS SECTION -->
+<!-- =============================== -->
+<section id="how-it-works" class="container my-5">
+
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">How It Works</h2>
+        <p class="text-muted">
+            TenderPro simplifies procurement for both suppliers and institutions through a transparent digital platform.
+        </p>
+    </div>
+
+    <div class="row g-5">
+
+        <!-- SUPPLIERS -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm p-4 h-100">
+
+                <h4 class="fw-bold mb-3 text-primary">For Suppliers & Vendors</h4>
+
+                <ul class="text-muted">
+                    <li>Register and create a supplier account</li>
+                    <li>Browse and filter tenders from institutions</li>
+                    <li>Access detailed tender requirements</li>
+                    <li>Submit bids securely with documents</li>
+                    <li>Receive updates and notifications</li>
+                    <li>Track bid status and performance</li>
+                </ul>
+
+            </div>
+        </div>
+
+        <!-- INSTITUTIONS -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm p-4 h-100">
+
+                <h4 class="fw-bold mb-3 text-success">For Procuring Entities</h4>
+
+                <ul class="text-muted">
+                    <li>Create and publish tenders</li>
+                    <li>Upload requirements and documents</li>
+                    <li>Receive and manage bids</li>
+                    <li>Evaluate submissions efficiently</li>
+                    <li>Award contracts transparently</li>
+                    <li>Maintain procurement records digitally</li>
+                </ul>
+
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =============================== -->
+<!-- CTA SECTION -->
+<!-- =============================== -->
+<section class="cta-section text-white text-center d-flex align-items-center">
+
+    <div class="container">
+
+        <h1 class="fw-bold mb-3">
+            Ready to Transform Procurement in Higher Learning Institutions?
+        </h1>
+
+        <p class="lead mb-4">
+            Join universities, colleges, and suppliers already using TenderPro to manage tenders efficiently.
+        </p>
+
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+
+            <a href="{% url 'register' %}" class="btn btn-light btn-lg px-4 fw-semibold">
+                👤 Register Now
+            </a>
+
+            <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg px-4 fw-semibold">
+                🔐 Login to Dashboard
+            </a>
+
         </div>
 
     </div>

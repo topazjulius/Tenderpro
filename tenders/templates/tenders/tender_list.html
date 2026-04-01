@@ -1,109 +1,258 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 
-<div class="container mt-5">
+<!-- =============================== -->
+<!-- TENDERS HERO SECTION -->
+<!-- =============================== -->
+<section class="tenders-hero d-flex align-items-center justify-content-center text-center text-white">
 
-<h2 class="mb-4">Available Tenders</h2>
+    <div class="container">
 
-<!-- SEARCH BAR -->
+        <h1 class="display-4 fw-bold mb-3">
+            Procurement Opportunities
+        </h1>
 
-<form method="GET" class="mb-4">
+        <p class="lead mb-4">
+            Discover active tenders from universities, colleges, and institutions across Kenya.
+            Submit bids, track progress, and grow your business.
+        </p>
 
-<div class="input-group">
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
 
-<input
-type="text"
-name="q"
-class="form-control"
-placeholder="Search tenders..."
-value="{{ query }}"
+            <!-- Scroll -->
+            <a href="#tenders-section" class="btn btn-light btn-lg px-4 shadow-sm">
+                📄 Browse Tenders
+            </a>
 
->
+            <a href="#prequalifications-section" class="btn btn-outline-light btn-lg px-4">
+                📊 View Prequalifications
+            </a>
 
-<button class="btn btn-primary">
-Search
-</button>
+        </div>
 
-</div>
+    </div>
+
+</section>
+
+
+<!-- =============================== -->
+<!-- SEARCH + FILTER BAR -->
+<!-- =============================== -->
+<div id="tenders-section" class="container mt-5">
+
+    <div class="card shadow-sm border-0 p-3 mb-4">
+
+        <form method="GET" class="row g-2 align-items-center">
+
+    <!-- 🔍 Search -->
+    <div class="col-md-4">
+        <input 
+            type="text" 
+            name="q" 
+            value="{{ query }}" 
+            class="form-control" 
+            placeholder="🔍 Search tenders..."
+        >
+    </div>
+
+    <!-- 🏫 Institution Filter -->
+    <div class="col-md-2">
+        <select name="institution" class="form-select">
+            <option value="">All Institutions</option>
+            {% for inst in institutions %}
+                <option value="{{ inst.id }}"
+                    {% if inst.id|stringformat:"s" == selected_institution %}selected{% endif %}>
+                    {{ inst.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- 🗂 Category Filter -->
+    <div class="col-md-2">
+        <select name="category" class="form-select">
+            <option value="">All Categories</option>
+            {% for cat in categories %}
+                <option value="{{ cat.id }}"
+                    {% if cat.id|stringformat:"s" == selected_category %}selected{% endif %}>
+                    {{ cat.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- 📌 Status Filter -->
+    <div class="col-md-2">
+        <select name="status" class="form-select">
+            <option value="">All</option>
+            <option value="open" {% if filter_status == "open" %}selected{% endif %}>
+                Open Only
+            </option>
+        </select>
+    </div>
+
+    <!-- 🔘 Button -->
+    <div class="col-md-2 d-grid">
+        <button class="btn btn-primary">
+            Filter
+        </button>
+    </div>
 
 </form>
 
-<!-- FILTER BUTTONS -->
-
-<div class="mb-4">
-
-<a href="?status=open" class="btn btn-success">
-Show Open Tenders
-</a>
-
-<a href="{% url 'tender_list' %}" class="btn btn-secondary">
-Show All Tenders
-</a>
+    </div>
 
 </div>
 
-<div class="row">
 
-{% for tender in tenders %}
+<!-- =============================== -->
+<!-- TENDERS LIST -->
+<!-- =============================== -->
+<div class="container">
 
-<div class="col-md-6">
+    <h2 class="mb-4 fw-bold text-center">Available Tenders</h2>
 
-<div class="card mb-4 shadow-sm">
+    <div class="row g-4">
 
-<div class="card-body">
+        {% for tender in tenders %}
 
-<h4>{{ tender.title }}</h4>
+        <div class="col-md-6">
 
-<p>{{ tender.description|truncatewords:25 }}</p>
+            <div class="card tender-card h-100 border-0 shadow-sm">
 
-<p>
-<strong>Deadline:</strong> {{ tender.deadline }}
-</p>
+                <div class="card-body">
 
-<!-- TENDER STATUS BADGES -->
+                    <!-- TITLE -->
+                    <h4 class="fw-bold mb-2">{{ tender.title }}</h4>
 
-<p>
+                    <!-- 🔥 INSTITUTION + CATEGORY (NEW UI) -->
+                    <div class="mb-2">
 
-{% if tender.awarded_bid %} <span class="badge bg-warning text-dark">🏆 AWARDED</span>
+                        {% if tender.institution %}
+                            <span class="badge bg-primary me-1">
+                                🎓 <a href="{% url 'tenders_by_institution' tender.institution.id %}" class="text-decoration-none fw-semibold">
+                                   {{ tender.institution.name }}
+                                   </a>
+                            </span>
+                        {% endif %}
 
-{% elif tender.is_open %} <span class="badge bg-success">OPEN</span>
+                        {% if tender.category %}
+                            <span class="badge bg-secondary">
+                                📂 <a href="{% url 'tenders_by_category' tender.category.id %}" class="text-decoration-none fw-semibold">
+                             {{ tender.category.name }}
+                        </a>
+                            </span>
+                        {% endif %}
 
-{% else %} <span class="badge bg-secondary">CLOSED</span>
+                    </div>
 
-{% endif %}
+                    <!-- DESCRIPTION -->
+                    <p class="text-muted">
+                        {{ tender.description|truncatewords:20 }}
+                    </p>
 
-</p>
+                    <!-- DEADLINE -->
+                    <p class="mb-2">
+                        <strong>Deadline:</strong> {{ tender.deadline }}
+                    </p>
 
-<!-- ACTION BUTTONS -->
+                    <!-- STATUS -->
+                    <p>
+                        <strong>Status:</strong>
 
-<a href="{% url 'tender_detail' tender.id %}" class="btn btn-primary">
-View Tender
-</a>
+                        {% if tender.is_open %}
+                            <span class="badge bg-success px-3 py-2">OPEN</span>
+                        {% else %}
+                            <span class="badge bg-danger px-3 py-2">CLOSED</span>
+                        {% endif %}
 
-{% if request.user.is_staff %} <a href="{% url 'evaluate_tender' tender.id %}" class="btn btn-warning">
-Evaluate Bids </a>
-{% endif %}
+                    </p>
+
+                    <!-- BUTTONS -->
+                    <div class="d-flex gap-2 mt-3">
+
+                        <a href="{% url 'tender_detail' tender.id %}" class="btn btn-outline-primary w-50">
+                            View
+                        </a>
+
+                        <a href="{% url 'place_bid' tender.id %}" class="btn btn-success w-50">
+                            Apply
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <div class="col-12 text-center">
+            <div class="alert alert-info">
+                No tenders available at the moment.
+            </div>
+        </div>
+
+        {% endfor %}
+
+    </div>
 
 </div>
 
-</div>
 
-</div>
+<!-- =============================== -->
+<!-- PREQUALIFICATIONS SECTION -->
+<!-- =============================== -->
+<div id="prequalifications-section" class="container mt-5 mb-5">
 
-{% empty %}
+    <h2 class="fw-bold text-center mb-3">
+        Prequalification Opportunities
+    </h2>
 
-<div class="col-12">
+    <p class="text-center text-muted mb-5">
+        Apply for supplier prequalification with institutions and organizations across Kenya.
+    </p>
 
-<div class="alert alert-warning">
-No tenders available.
-</div>
+    <div class="row g-4">
 
-</div>
+        <!-- CARD 1 -->
+        <div class="col-md-4">
+            <div class="card shadow-sm p-4 text-center h-100">
+                <h5 class="fw-bold">University Suppliers</h5>
+                <p class="text-muted">Register as a supplier for universities.</p>
+                <a href="{% url 'apply_prequalification' %}" class="btn btn-outline-primary">
+                    Apply
+                </a>
+            </div>
+        </div>
 
-{% endfor %}
+        <!-- CARD 2 -->
+        <div class="col-md-4">
+            <div class="card shadow-sm p-4 text-center h-100">
+                <h5 class="fw-bold">Government Vendors</h5>
+                <p class="text-muted">Get approved for government tenders.</p>
+                <a href="{% url 'apply_prequalification' %}" class="btn btn-outline-success">
+                    Apply
+                </a>
+            </div>
+        </div>
 
-</div>
+        <!-- CARD 3 -->
+        <div class="col-md-4">
+            <div class="card shadow-sm p-4 text-center h-100">
+                <h5 class="fw-bold">Private Sector</h5>
+                <p class="text-muted">Work with private companies.</p>
+                <a href="{% url 'apply_prequalification' %}" class="btn btn-outline-dark">
+                    Apply
+                </a>
+            </div>
+        </div>
+
+    </div>
 
 </div>
 

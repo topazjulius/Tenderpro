@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Tender Management System</title>
+    <title>TenderPro</title>
 
     <!-- ✅ Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -15,11 +15,11 @@
     <!-- ✅ FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <!-- ✅ YOUR CUSTOM CSS -->
+    <!-- ✅ CUSTOM CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 
-<body style="background:#f5f7fb;">
+<body>
 
 <!-- =============================== -->
 <!-- NAVBAR -->
@@ -40,28 +40,89 @@
 
 <ul class="navbar-nav ms-auto align-items-center">
 
-<!-- COMMON -->
+<!-- HOME -->
 <li class="nav-item">
 <a class="nav-link" href="/">Home</a>
 </li>
 
+<!-- TENDERS -->
 <li class="nav-item">
 <a class="nav-link" href="/tenders/">Tenders</a>
 </li>
 
 <li class="nav-item">
-    <a class="nav-link" href="{% url 'about' %}">About</a>
+    <a class="nav-link" href="{% url 'awarded_tenders' %}">
+        Awarded
+    </a>
 </li>
+{% if user.is_authenticated %}
+
+<!-- DASHBOARD (MOVED HERE ✅) -->
+<li class="nav-item">
+<a class="nav-link" href="/dashboard/">Dashboard</a>
+</li>
+
+{% endif %}
+
+<!-- ABOUT -->
+<li class="nav-item">
+<a class="nav-link" href="{% url 'about' %}">About</a>
+</li>
+
+<!-- CONTACT -->
 <li class="nav-item">
 <a class="nav-link" href="{% url 'contact' %}">Contact</a>
 </li>
 
 {% if user.is_authenticated %}
 
-<li class="nav-item">
-<a class="nav-link" href="/dashboard/">Dashboard</a>
+<!-- =============================== -->
+<!-- 🔔 NOTIFICATIONS -->
+<!-- =============================== -->
+<li class="nav-item dropdown">
+    <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown">
+        <i class="fas fa-bell"></i>
+
+        {% if unread_count > 0 %}
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            {{ unread_count }}
+        </span>
+        {% endif %}
+    </a>
+
+    <ul class="dropdown-menu dropdown-menu-end p-2" style="width:300px; max-height:300px; overflow-y:auto;">
+
+        {% if notifications %}
+            {% for notification in notifications %}
+                <li class="dropdown-item small {% if not notification.is_read %}fw-bold{% endif %}">
+                    <a href="{% url 'mark_notifications_read' %}" class="text-decoration-none text-dark">
+                      {{ notification.message }}
+                    </a>
+                </li>
+            {% endfor %}
+        {% else %}
+            <li class="dropdown-item text-center text-muted">
+                No notifications
+            </li>
+        {% endif %}
+
+        <li><hr class="dropdown-divider"></li>
+
+        <li class="text-center">
+            <a href="{% url 'mark_notifications_read' %}" class="small text-decoration-none">
+                Mark all as read
+            </a>
+        </li>
+        <li class="text-center">
+    <a href="{% url 'notifications' %}" class="small text-decoration-none">
+        View All Notifications
+    </a>
 </li>
 
+    </ul>
+</li>
+
+<!-- ADMIN LINKS -->
 {% if user.is_staff %}
 
 <li class="nav-item">
@@ -84,6 +145,7 @@ Django Admin
 
 {% endif %}
 
+<!-- LOGOUT -->
 <li class="nav-item">
 <a class="nav-link text-danger" href="/accounts/logout/">
 Logout
@@ -92,12 +154,14 @@ Logout
 
 {% else %}
 
+<!-- LOGIN -->
 <li class="nav-item">
 <a class="nav-link" href="/accounts/login/">
 Login
 </a>
 </li>
 
+<!-- REGISTER -->
 <li class="nav-item">
 <a class="btn btn-light text-primary ms-2 px-3" href="/accounts/register/">
 Register
@@ -115,29 +179,29 @@ Register
 </nav>
 
 <!-- =============================== -->
-<!-- PAGE CONTENT -->
+<!-- FLASH MESSAGES -->
 <!-- =============================== -->
-<div class="container mt-5">
-
 {% if messages %}
+<div class="container mt-3">
     {% for message in messages %}
-        <div class="container mt-3">
-            <div class="alert alert-success">
-                {{ message }}
-            </div>
+        <div class="alert alert-{{ message.tags|default:'success' }}">
+            {{ message }}
         </div>
     {% endfor %}
-{% endif %}
-    {% block content %}
-{% endblock %}
-
 </div>
+{% endif %}
+
+<!-- =============================== -->
+<!-- PAGE CONTENT -->
+<!-- =============================== -->
+{% block content %}
+{% endblock %}
 
 <!-- =============================== -->
 <!-- FOOTER -->
 <!-- =============================== -->
 <footer class="bg-dark text-white text-center p-4 mt-5">
-    Tender Management System © 2026
+    TenderPro © 2026
 </footer>
 
 <!-- =============================== -->
@@ -145,6 +209,39 @@ Register
 <!-- =============================== -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+setInterval(function() {
+    fetch(window.location.href, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.text())
+    .then(html => {
+        console.log("Notifications refreshed");
+    });
+}, 15000); // refresh every 15 seconds
+</script>
 
+<script>
+    const faders = document.querySelectorAll('.fade-in');
+
+    const appearOptions = {
+        threshold: 0.2
+    };
+
+    const appearOnScroll = new IntersectionObserver(function(entries, observer) {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+
+            entry.target.classList.add('show');
+            observer.unobserve(entry.target);
+        });
+    }, appearOptions);
+
+    faders.forEach(fader => {
+        appearOnScroll.observe(fader);
+    });
+</script>
 </body>
 </html>

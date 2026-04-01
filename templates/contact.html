@@ -4,15 +4,13 @@
 {% block content %}
 
 <!-- =============================== -->
-<!-- CONTACT HERO -->
+<!-- HERO -->
 <!-- =============================== -->
-<div class="hero-section d-flex align-items-center justify-content-center text-center text-white">
+<div class="contact-hero d-flex align-items-center justify-content-center text-center text-white">
 
     <div>
-        <h1 class="fw-bold">Contact Us</h1>
-        <p class="lead">We'd love to hear from you. <br>
-            Our team is here to help you succeed.
-        </p>
+        <h1 class="fw-bold display-5">Contact TenderPro</h1>
+        <p class="lead">Let’s build opportunities together</p>
     </div>
 
 </div>
@@ -23,32 +21,36 @@
 <!-- =============================== -->
 <div class="container my-5">
 
-    <div class="row g-5">
+    <div class="row g-5 align-items-center">
 
-        <!-- LEFT: CONTACT INFO -->
+        <!-- LEFT SIDE -->
         <div class="col-md-5">
 
-            <h3 class="fw-bold mb-4">Get in Touch</h3>
+            <h3 class="fw-bold mb-4">Reach Out</h3>
 
             <p class="text-muted">
-                Have questions about tenders, bidding, or partnerships?
-                Reach out to us anytime.
+                Questions about tenders, bidding, or partnerships?
+                Our team is ready to help you succeed.
             </p>
 
-            <p><i class="fas fa-envelope me-2 text-primary"></i> support@tenderpro.com</p>
-            <p><i class="fas fa-phone me-2 text-success"></i> +254 700 000 000</p>
-            <p><i class="fas fa-map-marker-alt me-2 text-danger"></i> Nairobi, Kenya</p>
+            <div class="contact-info mt-4">
+
+                <p><i class="fas fa-envelope text-primary me-2"></i> support@tenderpro.com</p>
+                <p><i class="fas fa-phone text-success me-2"></i> +254 700 000 000</p>
+                <p><i class="fas fa-map-marker-alt text-danger me-2"></i> Nairobi, Kenya</p>
+
+            </div>
 
         </div>
 
-        <!-- RIGHT: CONTACT FORM -->
+
+        <!-- RIGHT SIDE (GLASS FORM) -->
         <div class="col-md-7">
 
-            <div class="card shadow p-4">
+            <div class="glass-card p-4">
 
-                <h4 class="mb-3">Send Message</h4>
+                <h4 class="mb-4">Send a Message</h4>
 
-                <!-- SUCCESS MESSAGE -->
                 {% if messages %}
                     {% for message in messages %}
                         <div class="alert alert-success">
@@ -60,22 +62,23 @@
                 <form method="POST">
                     {% csrf_token %}
 
-                    <div class="mb-3">
-                        <label>Name</label>
-                        <input type="text" name="name" class="form-control" required>
+                    <!-- FLOATING INPUT -->
+                    <div class="form-floating mb-3">
+                        <input type="text" name="name" class="form-control" placeholder="Name" required>
+                        <label>Your Name</label>
                     </div>
 
-                    <div class="mb-3">
-                        <label>Email</label>
-                        <input type="email" name="email" class="form-control" required>
+                    <div class="form-floating mb-3">
+                        <input type="email" name="email" class="form-control" placeholder="Email" required>
+                        <label>Email Address</label>
                     </div>
 
-                    <div class="mb-3">
-                        <label>Message</label>
-                        <textarea name="message" rows="5" class="form-control" required></textarea>
+                    <div class="form-floating mb-3">
+                        <textarea name="message" class="form-control" placeholder="Message" style="height:120px" required></textarea>
+                        <label>Your Message</label>
                     </div>
 
-                    <button class="btn btn-primary w-100">
+                    <button class="btn btn-primary w-100 btn-lg">
                         Send Message
                     </button>
 

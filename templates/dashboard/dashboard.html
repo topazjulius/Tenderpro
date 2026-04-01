@@ -4,25 +4,70 @@
 
 <div class="container-fluid mt-4">
 
+<!-- =============================== -->
 <!-- HEADER -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="fw-bold">Vendor Dashboard</h3>
-    <span class="text-muted">Welcome, {{ request.user.username }}</span>
+<!-- =============================== -->
+<div class="dashboard-header text-white p-4 rounded-4 mb-4">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+            <h2 class="fw-bold mb-1">Welcome back, {{ request.user.username }}</h2>
+            <p class="mb-0 opacity-75">Here’s what’s happening with your bids today</p>
+        </div>
+
+
+<!-- =============================== -->
+<!-- 🚀 QUICK ACTIONS (🔥 NEW) -->
+<!-- =============================== -->
+ <div>
+            <a href="{% url 'tender_list' %}" class="btn btn-light btn-sm fw-semibold">
+                + Browse Tenders
+            </a>
+        </div></div></div>
+
+    <a href="{% url 'apply_prequalification' %}" class="btn btn-outline-primary">
+        📄 Apply Prequalification
+    </a>
 </div>
 
-<!-- KPI CARDS -->
+
+<!-- =============================== -->
+<!-- 🔔 NOTIFICATIONS -->
+<!-- =============================== -->
+<div class="card shadow-sm mb-4 border-0">
+    <div class="card-body">
+
+        <h5 class="fw-bold mb-3">🔔 Notifications</h5>
+
+        {% for notification in request.user.notification_set.all|slice:":5" %}
+            <div class="mb-2 small {% if not notification.is_read %}fw-bold text-dark{% else %}text-muted{% endif %}">
+                {{ notification.message }}
+            </div>
+        {% empty %}
+            <div class="text-center py-3">
+                <p class="text-muted">No notifications yet</p>
+            </div>
+        {% endfor %}
+
+    </div>
+</div>
+
+
+<!-- =============================== -->
+<!-- 📊 KPI CARDS (IMPROVED) -->
+<!-- =============================== -->
 <div class="row g-4 mb-4">
 
 <div class="col-md-3">
-<div class="card shadow border-0 p-3 text-center">
-<i class="fa-solid fa-file-contract fa-2x text-primary mb-2"></i>
-<h4>{{ total_tenders|default:0 }}</h4>
-<p class="text-muted mb-0">Total Tenders</p>
-</div>
+    <div class="card shadow-sm border-0 p-4 text-center h-100">
+        <i class="fa-solid fa-file-contract fa-2x text-primary mb-3"></i>
+        <h3 class="fw-bold">{{ total_tenders|default:0 }}</h3>
+        <p class="text-muted mb-0">Total Tenders</p>
+    </div>
 </div>
 
 <div class="col-md-3">
-<div class="card shadow border-0 p-3 text-center">
+<div class="card dashboard-card border-0 p-4 text-center">
 <i class="fa-solid fa-gavel fa-2x text-success mb-2"></i>
 <h4>{{ total_bids|default:0 }}</h4>
 <p class="text-muted mb-0">My Bids</p>
@@ -30,7 +75,7 @@
 </div>
 
 <div class="col-md-3">
-<div class="card shadow border-0 p-3 text-center">
+<div class="card dashboard-card border-0 p-4 text-center">
 <i class="fa-solid fa-hourglass-half fa-2x text-warning mb-2"></i>
 <h4>{{ open_tenders|default:0 }}</h4>
 <p class="text-muted mb-0">Open Tenders</p>
@@ -38,16 +83,72 @@
 </div>
 
 <div class="col-md-3">
-<div class="card shadow border-0 p-3 text-center">
+<div class="card dashboard-card border-0 p-4 text-center">
 <i class="fa-solid fa-trophy fa-2x text-danger mb-2"></i>
-<h4>{{ awarded_tenders|default:0 }}</h4>
+<h4>{{ awards|default:0 }}</h4>
 <p class="text-muted mb-0">Awards</p>
 </div>
 </div>
 
 </div>
 
-<!-- BID TABLE -->
+<div class="col-md-3">
+    <div class="card shadow-sm border-0 p-4 text-center h-100">
+        <i class="fa-solid fa-chart-pie fa-2x text-info mb-3"></i>
+        <h4 class="fw-bold">
+            {{ total_bids|default:0 }}
+        </h4>
+        <p class="text-muted mb-0">Engagement</p>
+    </div>
+</div>
+
+
+<!-- =============================== -->
+<!-- 📌 RECENT ACTIVITY (🔥 NEW) -->
+<!-- =============================== -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+
+        <h5 class="fw-bold mb-3">📌 Recent Activity</h5>
+
+        {% if recent_bids %}
+            <ul class="list-group list-group-flush">
+
+                {% for bid in recent_bids %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+
+                    <div>
+                        Bid on <strong>{{ bid.tender.title }}</strong>
+                        <br>
+                        <small class="text-muted">{{ bid.submitted_at }}</small>
+                    </div>
+
+                    <span class="badge bg-primary">
+                        KES {{ bid.amount }}
+                    </span>
+
+                </li>
+                {% endfor %}
+
+            </ul>
+        {% else %}
+
+            <div class="text-center py-4">
+                <p class="text-muted">No activity yet</p>
+                <a href="{% url 'tender_list' %}" class="btn btn-primary">
+                    Browse Tenders
+                </a>
+            </div>
+
+        {% endif %}
+
+    </div>
+</div>
+
+
+<!-- =============================== -->
+<!-- 📄 MY BIDS TABLE -->
+<!-- =============================== -->
 <div class="card shadow border-0">
 
 <div class="card-header bg-white border-0">
@@ -65,7 +166,7 @@
 <thead class="table-light">
 <tr>
 <th>Tender</th>
-<th>Bid Amount</th>
+<th>Amount</th>
 <th>Submitted</th>
 <th>Status</th>
 </tr>
@@ -122,7 +223,7 @@ Ksh {{ bid.amount }}
 <h5>No bids yet</h5>
 <p class="text-muted">You haven’t applied to any tenders yet.</p>
 
-<a href="/tenders/" class="btn btn-primary mt-2">
+<a href="{% url 'tender_list' %}" class="btn btn-primary mt-2">
 Browse Tenders
 </a>
 </div>
